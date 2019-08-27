@@ -1,18 +1,15 @@
 package com.pepe.zhihu;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
-import android.os.Bundle;
 import android.view.View;
 
 import com.pepe.zhihu.inject.component.AppComponent;
 import com.pepe.zhihu.inject.component.DaggerActivityComponent;
 import com.pepe.zhihu.inject.module.ActivityModule;
+import com.pepe.zhihu.mvp.contract.IMainContract;
 import com.pepe.zhihu.mvp.presenter.MainPresenter;
 import com.pepe.zhihu.ui.activity.base.BaseActivity;
 
-public class MainActivity extends BaseActivity<MainPresenter> implements View.OnClickListener {
+public class MainActivity extends BaseActivity<MainPresenter> implements IMainContract.View, View.OnClickListener {
 
     @Override
     protected void setupActivityComponent(AppComponent appComponent) {
@@ -32,7 +29,12 @@ public class MainActivity extends BaseActivity<MainPresenter> implements View.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.mBtnSimpleGet:
-                mPresenter.simpleGetRequest();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPresenter.simpleGetRequest();
+                    }
+                }).start();
                 break;
             case R.id.mBtnSimpleGetForJson:
                 mPresenter.simpleGetRequestForJson();

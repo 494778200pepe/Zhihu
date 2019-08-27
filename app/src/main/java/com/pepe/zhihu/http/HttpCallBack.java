@@ -9,6 +9,12 @@ import com.pepe.zhihu.utils.LogUtil;
  * @date 2019/8/7.
  */
 public abstract class HttpCallBack<T> implements EngineCallback {
+
+    Converter mConverter;
+    public void setConverter(Converter converter){
+        mConverter = converter;
+    }
+
     @Override
     public void onSuccess(String result) {
         // 做解析
@@ -16,9 +22,8 @@ public abstract class HttpCallBack<T> implements EngineCallback {
         LogUtil.d("HttpCallBack onSuccess");
         LogUtil.d("HttpCallBack result = \n" + result);
         try {
-            Converter converter = HttpUtils.mConfig.converter;
             Class<T> resultT = (Class<T>) Utils.analysisClazzInfo(this);
-            T resultObj = converter.convert(result, resultT);
+            T resultObj = mConverter.convert(result, resultT);
             onSuccess(resultObj);
         } catch (Exception e) {
             // 操作异常 ，解析，访问数据正常，但是拿到结果后操作出错

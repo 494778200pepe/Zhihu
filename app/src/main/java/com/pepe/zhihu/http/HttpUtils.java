@@ -4,9 +4,10 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.text.TextUtils;
-import android.widget.ProgressBar;
+
 
 import com.pepe.zhihu.http.convert.Converter;
+import com.pepe.zhihu.utils.LogUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,8 @@ public class HttpUtils<R> {
     private Map<String, String> mHeaders;
     private String mUrl;
     private ProgressDialog mProgressDialog;
+    private Converter mConverter;
+    private static Converter mInitConverter;
     public static EngineConfig mConfig;
 
     public static HttpUtils with(Context context) {
@@ -50,6 +53,7 @@ public class HttpUtils<R> {
     public static void initConfig(EngineConfig engineConfig) {
         mConfig = engineConfig;
         mInitHttpRequest = mConfig.getEngineRequest();
+        mInitConverter = mConfig.getConverter();
     }
 
     public HttpUtils param(String key, Object value) {
@@ -74,6 +78,11 @@ public class HttpUtils<R> {
         return this;
     }
 
+    public HttpUtils converter(Converter converter) {
+        this.mConverter = converter;
+        return this;
+    }
+
     public HttpUtils cache(boolean cache) {
         return this;
     }
@@ -86,14 +95,19 @@ public class HttpUtils<R> {
         if (mHttpRequest == null) {
             mHttpRequest = mInitHttpRequest;
         }
+        if (mConverter == null) {
+            mConverter = mInitConverter;
+        }
         if (mHttpRequest == null) {
             throw new NullPointerException("HttpRequest 是空，请配置");
         }
         if (TextUtils.isEmpty(mUrl)) {
             throw new NullPointerException("访问路径为空");
         }
+        callback.setConverter(mConverter);
         // 异常判断
         if (mType == TYPE_GET) {
+            LogUtil.d("HttpUtils  request  mProgressDialog == null ?  " + (mProgressDialog == null));
             return mHttpRequest.get(mContext, mUrl, mParams, callback, true, mProgressDialog);
         } else if (mType == TYPE_POST) {
             return mHttpRequest.post(mContext, mUrl, mParams, callback, true, mProgressDialog);

@@ -4,6 +4,8 @@ package com.pepe.zhihu.http.retrofit;
 
 import android.app.ProgressDialog;
 
+import com.pepe.zhihu.utils.LogUtil;
+
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import retrofit2.Response;
@@ -36,6 +38,7 @@ public class HttpSubscriber<T> implements Observer<Response<T>> {
         if (mObserver != null) {
             mObserver.onError(e);
         }
+        LogUtil.d("HttpSubscriber  onError");
         if (mProgressDialog != null) {
             mProgressDialog.cancel();
         }
@@ -43,7 +46,9 @@ public class HttpSubscriber<T> implements Observer<Response<T>> {
 
     @Override
     public void onComplete() {
+        LogUtil.d("HttpSubscriber  onComplete");
         if (mProgressDialog != null) {
+            LogUtil.d("HttpSubscriber  onComplete   cancel");
             mProgressDialog.cancel();
         }
     }

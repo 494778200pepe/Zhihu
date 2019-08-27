@@ -1,5 +1,6 @@
 package com.pepe.zhihu.mvp.presenter.base;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
     private boolean isAttached = false;
     private boolean isViewInitialized = false;
 
+    private ArrayList<HttpSubscriber> subscribers;
     public CompositeDisposable mCompositeDisposable;
 
     public BasePresenter() {
@@ -68,6 +70,7 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
         mView = view;
         onViewAttached();
         isAttached = true;
+        subscribers = new ArrayList<>();
         mCompositeDisposable = new CompositeDisposable();
     }
 
@@ -77,10 +80,14 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
     @Override
     public void detachView() {
         mView = null;
-        if (mCompositeDisposable != null) {
-            mCompositeDisposable.clear(); // clear时网络请求会随即cancel
-            mCompositeDisposable = null;
+        //view 取消绑定时，把请求取消订阅
+        for (HttpSubscriber observer : subscribers) {
+            if (observer != null && !observer.getDisposable().isDisposed()) {
+                observer.getDisposable().dispose();
+                LogUtil.d("unsubscribe:" + observer.toString());
+            }
         }
+        clearRequest();
     }
 
     @Override
@@ -107,7 +114,7 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
     @NonNull
     @Override
     public Context getContext() {
-        if (mView instanceof Context) {
+        if (mView instanceof Activity) {
             return (Context) mView;
         } else if (mView instanceof Fragment) {
             return ((Fragment) mView).getContext();

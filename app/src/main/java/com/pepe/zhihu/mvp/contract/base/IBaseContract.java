@@ -16,7 +16,8 @@ import androidx.annotation.Nullable;
 public interface IBaseContract {
 
     interface View {
-
+        ProgressDialog getProgressDialog();
+        void initProgressDialog();
     }
 
     interface Presenter<V extends IBaseContract.View> {

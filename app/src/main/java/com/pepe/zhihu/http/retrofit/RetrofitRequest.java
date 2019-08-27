@@ -12,6 +12,7 @@ import com.pepe.zhihu.utils.LogUtil;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -54,6 +55,7 @@ public class RetrofitRequest implements IHttpRequest<Disposable> {
                 ,progressDialog);
         Observable<Response<ResponseBody>> observable =
                 RetrofitClient.INSTANCE.getRetrofit(url).create(RetrofitApi.class).getMethod(url, params);
+
         return generalRxHttpExecute(observable, subscriber, progressDialog);
     }
 
@@ -96,11 +98,14 @@ public class RetrofitRequest implements IHttpRequest<Disposable> {
     protected <T> Disposable generalRxHttpExecute(
             @NonNull Observable<Response<T>> observable, @Nullable HttpSubscriber<T> subscriber, final ProgressDialog dialog) {
         if (subscriber != null) {
-            observable.subscribeOn(Schedulers.io())
+            observable
+                    .subscribeOn(Schedulers.io())
                     .doOnSubscribe(new Consumer<Disposable>() {
                         @Override
                         public void accept(Disposable disposable) throws Exception {
+                            LogUtil.d("RetrofitRequest  doOnSubscribe");
                             if (dialog != null) {
+                                LogUtil.d("RetrofitRequest  doOnSubscribe    dialog.show");
                                 dialog.show();
                             }
                         }

@@ -8,6 +8,8 @@ import com.pepe.zhihu.bean.ListBean;
 import com.pepe.zhihu.bean.User;
 import com.pepe.zhihu.http.HttpCallBack;
 import com.pepe.zhihu.http.HttpUtils;
+import com.pepe.zhihu.http.convert.JsonConvert;
+import com.pepe.zhihu.http.retrofit.HttpSubscriber;
 import com.pepe.zhihu.http.retrofit.RetrofitRequest;
 import com.pepe.zhihu.mvp.contract.IMainContract;
 import com.pepe.zhihu.mvp.presenter.base.BasePresenter;
@@ -55,7 +57,7 @@ public class MainPresenter extends BasePresenter<IMainContract.View>
                 .get()
                 .url(url)
                 .httpRequest(new RetrofitRequest())
-                .progressBar(new ProgressDialog(getContext()))
+                .progressBar(mView.getProgressDialog())
                 .param("iid", null)
                 .param("aid", null)
                 .request(new HttpCallBack<User>() {
@@ -84,6 +86,7 @@ public class MainPresenter extends BasePresenter<IMainContract.View>
                 .url(url)
                 .httpRequest(new RetrofitRequest())
                 .progressBar(new ProgressDialog(getContext()))
+                .converter(new JsonConvert())
                 .param("from", 0)
                 .param("limit", 20)
                 .param("order", 1)

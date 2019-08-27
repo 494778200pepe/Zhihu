@@ -1,5 +1,6 @@
 package com.pepe.zhihu.mvp.contract;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 
 import com.pepe.zhihu.mvp.contract.base.IBaseContract;
@@ -11,6 +12,7 @@ import com.pepe.zhihu.mvp.contract.base.IBaseContract;
 public interface IMainContract {
 
     interface View extends IBaseContract.View{
+
 
     }
 

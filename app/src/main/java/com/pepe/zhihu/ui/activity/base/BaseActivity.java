@@ -1,5 +1,6 @@
 package com.pepe.zhihu.ui.activity.base;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 
@@ -8,10 +9,12 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import com.pepe.zhihu.AppApplication;
 import com.pepe.zhihu.inject.component.AppComponent;
 import com.pepe.zhihu.mvp.contract.base.IBaseContract;
+import com.pepe.zhihu.utils.LogUtil;
 import com.thirtydegreesray.dataautoaccess.DataAutoAccess;
 
 import javax.inject.Inject;
@@ -28,6 +31,7 @@ public abstract class BaseActivity<P extends IBaseContract.Presenter> extends Ap
     protected P mPresenter;
 
     private static BaseActivity curActivity;
+    private  ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,12 +48,34 @@ public abstract class BaseActivity<P extends IBaseContract.Presenter> extends Ap
 //            ButterKnife.bind(getActivity());
         }
         initActivity();
+        initProgressDialog();
         initView(savedInstanceState);
         if(mPresenter != null) {
             mPresenter.onViewInitialized();
         }
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        curActivity = getActivity();
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LogUtil.d("===> onStop");
+        if (mPresenter != null) {
+            mPresenter.detachView();
+        }
+        if (this.equals(curActivity)) {
+            curActivity = null;
+        }
+    }
     /**
      * 依赖注入的入口
      * @param appComponent appComponent
@@ -90,5 +116,17 @@ public abstract class BaseActivity<P extends IBaseContract.Presenter> extends Ap
 
     protected AppComponent getAppComponent(){
         return getAppApplication().getAppComponent();
+    }
+
+
+
+    @Override
+    public void initProgressDialog() {
+        mProgressDialog =  new ProgressDialog(this);
+    }
+
+    @Override
+    public ProgressDialog getProgressDialog() {
+        return mProgressDialog;
     }
 }
