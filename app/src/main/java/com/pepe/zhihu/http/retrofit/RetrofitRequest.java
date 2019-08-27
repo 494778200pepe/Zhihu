@@ -6,6 +6,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.pepe.zhihu.R;
 import com.pepe.zhihu.http.HttpCallBack;
 import com.pepe.zhihu.http.IHttpRequest;
 import com.pepe.zhihu.utils.LogUtil;
@@ -28,10 +29,10 @@ import retrofit2.Response;
  * @author 1one
  * @date 2019/8/27.
  */
-public class RetrofitRequest implements IHttpRequest<Disposable> {
+public class RetrofitRequest implements IHttpRequest<RetrofitCancelable> {
 
     @Override
-    public <T> Disposable get(Context context, String url, Map<String, Object> params, final HttpCallBack<T> callback, boolean cache, final ProgressDialog progressDialog) {
+    public <T> RetrofitCancelable get(Context context, String url, Map<String, Object> params, final HttpCallBack<T> callback, boolean cache, final ProgressDialog progressDialog) {
         HttpSubscriber<ResponseBody> subscriber =
                 new HttpSubscriber<>(
                         new HttpObserver<ResponseBody>() {
@@ -55,12 +56,12 @@ public class RetrofitRequest implements IHttpRequest<Disposable> {
                 ,progressDialog);
         Observable<Response<ResponseBody>> observable =
                 RetrofitClient.INSTANCE.getRetrofit(url).create(RetrofitApi.class).getMethod(url, params);
-
-        return generalRxHttpExecute(observable, subscriber, progressDialog);
+        Disposable disposable = generalRxHttpExecute(observable, subscriber, progressDialog);
+        return new RetrofitCancelable(disposable);
     }
 
     @Override
-    public <T> Disposable post(Context context, String url, Map<String, Object> params, final HttpCallBack<T> callback, boolean cache, ProgressDialog progressDialog) {
+    public <T> RetrofitCancelable post(Context context, String url, Map<String, Object> params, final HttpCallBack<T> callback, boolean cache, ProgressDialog progressDialog) {
         RetrofitClient.INSTANCE.getRetrofit().create(RetrofitApi.class).postMethod(url, params).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

@@ -4,13 +4,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.widget.ProgressBar;
 
+import com.pepe.zhihu.R;
+
 import java.util.Map;
 
 /**
  * @author 1one
  * @date 2019/8/27.
  */
-public interface IHttpRequest<R> {
+public interface IHttpRequest<R extends ICancelable> {
 
     <T> R get(Context context, String url, Map<String, Object> params,
               final HttpCallBack<T> callback, final boolean cache, ProgressDialog progressDialog);

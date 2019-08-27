@@ -8,6 +8,7 @@ import com.pepe.zhihu.bean.ListBean;
 import com.pepe.zhihu.bean.User;
 import com.pepe.zhihu.http.HttpCallBack;
 import com.pepe.zhihu.http.HttpUtils;
+import com.pepe.zhihu.http.ICancelable;
 import com.pepe.zhihu.http.convert.JsonConvert;
 import com.pepe.zhihu.http.retrofit.HttpSubscriber;
 import com.pepe.zhihu.http.retrofit.RetrofitRequest;
@@ -29,7 +30,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -53,7 +53,7 @@ public class MainPresenter extends BasePresenter<IMainContract.View>
         String baseUrl = "https://api.github.com/users/";
         String userName = "494778200pepe";
         String url = baseUrl + userName;
-        Disposable disposable = (Disposable) HttpUtils.with(getContext())
+        ICancelable cancelable = HttpUtils.with(getContext())
                 .get()
                 .url(url)
                 .httpRequest(new RetrofitRequest())
@@ -72,7 +72,7 @@ public class MainPresenter extends BasePresenter<IMainContract.View>
                         LogUtil.d("MainPresenter user.id = " + user.getId());
                     }
                 });
-        addRequest(disposable);
+        addRequest(cancelable);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class MainPresenter extends BasePresenter<IMainContract.View>
 //        String userName = "494778200pepe";
 //        url = String.format(url, userName);
         String url = "http://chepai.ketao.com/api/goods/list";
-        Disposable disposable = (Disposable) HttpUtils.with(getContext())
+        ICancelable cancelable = HttpUtils.with(getContext())
                 .get()
                 .url(url)
                 .httpRequest(new RetrofitRequest())
@@ -103,7 +103,7 @@ public class MainPresenter extends BasePresenter<IMainContract.View>
 
                     }
                 });
-        addRequest(disposable);
+        addRequest(cancelable);
     }
 
     @Override

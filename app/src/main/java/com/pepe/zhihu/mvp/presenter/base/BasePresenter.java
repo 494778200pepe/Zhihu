@@ -12,6 +12,7 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 
 import com.pepe.zhihu.R;
+import com.pepe.zhihu.http.ICancelable;
 import com.pepe.zhihu.http.retrofit.HttpObserver;
 import com.pepe.zhihu.http.retrofit.HttpResponse;
 import com.pepe.zhihu.http.retrofit.HttpSubscriber;
@@ -40,8 +41,7 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
     private boolean isAttached = false;
     private boolean isViewInitialized = false;
 
-    private ArrayList<HttpSubscriber> subscribers;
-    public CompositeDisposable mCompositeDisposable;
+    ArrayList<ICancelable> cancelables;
 
     public BasePresenter() {
         LogUtil.d("===> BasePresenter");
@@ -70,8 +70,7 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
         mView = view;
         onViewAttached();
         isAttached = true;
-        subscribers = new ArrayList<>();
-        mCompositeDisposable = new CompositeDisposable();
+        cancelables = new ArrayList<>();
     }
 
     /**
@@ -80,13 +79,6 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
     @Override
     public void detachView() {
         mView = null;
-        //view 取消绑定时，把请求取消订阅
-        for (HttpSubscriber observer : subscribers) {
-            if (observer != null && !observer.getDisposable().isDisposed()) {
-                observer.getDisposable().dispose();
-                LogUtil.d("unsubscribe:" + observer.toString());
-            }
-        }
         clearRequest();
     }
 
@@ -128,16 +120,14 @@ public abstract class BasePresenter<V extends IBaseContract.View> implements IBa
         return getContext().getResources().getString(resId);
     }
 
-    public void addRequest(Disposable disposable){
-        if (mCompositeDisposable != null && !mCompositeDisposable.isDisposed()) {
-            mCompositeDisposable.add(disposable);
-        }
+    public void addRequest(ICancelable cancelable){
+        cancelables.add(cancelable);
     }
 
     public void clearRequest(){
-        if (mCompositeDisposable != null) {
-            mCompositeDisposable.clear(); // clear时网络请求会随即cancel
-            mCompositeDisposable = null;
+        for (ICancelable cancelable : cancelables) {
+            cancelable.cancel();
         }
+
     }
 }

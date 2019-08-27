@@ -91,7 +91,7 @@ public class HttpUtils<R> {
         request(null);
     }
 
-    public <T> Object request(final HttpCallBack<T> callback) {
+    public <T> ICancelable request(final HttpCallBack<T> callback) {
         if (mHttpRequest == null) {
             mHttpRequest = mInitHttpRequest;
         }

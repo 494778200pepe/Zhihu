@@ -17,9 +17,6 @@ public abstract class HttpCallBack<T> implements EngineCallback {
 
     @Override
     public void onSuccess(String result) {
-        // 做解析
-        // 不能直接用 Gson 去解析，通过配置去解析
-        LogUtil.d("HttpCallBack onSuccess");
         LogUtil.d("HttpCallBack result = \n" + result);
         try {
             Class<T> resultT = (Class<T>) Utils.analysisClazzInfo(this);
